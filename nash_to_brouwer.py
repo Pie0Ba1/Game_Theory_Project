@@ -2,6 +2,7 @@
 # we consider 2 player game with 2 pure strategies for each player and payoffs
 # utilities[i, j, k] = what a player i gets if he plays j and the other player plays k
 # all i, j, k are elements of {0, 1}
+#for definition of a, A, ... see article
 # player 1 plays option 0 with probability alfa in [0, 1]
 # player 2 plays option 0 with probability beta in [0, 1]
 # strategies = [alfa, beta]
@@ -16,16 +17,39 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+#choose a game (uncomment)
 name_game = 'Cooperation game'
-utilities = np.array([[[4, 0], [0, 2]],
-                      [[4, 0], [0, 2]]])
-Nash_equilibria = np.array([[0, 0], [1, 1], [1.0/3.0, 1.0/3.0]])
+a, A, d, D, b, B, c, C = 4, 4, 2, 2, 0, 0, 0, 0
+
+# name_game = "No pure Nash equilibrium"
+# a, A, d, D, b, B, c, C = 0, 0, 1, 1, 2, -1, 3, -1
 
 # name_game = "Prisoner's dilemma"
-# utilities = np.array([[[-1, -3], [0, -2]],
-#                       [[-1, -3], [0, -2]]])
-# Nash_equilibria = np.array([[0, 0], ])
+#a, A, d, D, b, B, c, C = -1, -1, -2, -2, -3, -3, 0, 0
 
+
+#form suitable for further calculations
+utilities = np.array([[[a, b], [c, d]],
+                      [[A, B], [C, D]]])
+
+
+def find_NE(a, A, d, D, b, B, c, C):
+    NE = []
+    if a>c and A>C:
+        NE.append([1, 1])
+    if d>b and D>B:
+        NE.append([0, 0])
+    if b>d and C>A:
+        NE.append([1, 0])
+    if c>a and B>D:
+        NE.append([0, 1])
+    mixed_nash = [(D-B)/(A-C-B+D), (d-b)/(a-c-b+d)]
+    if (mixed_nash[0] >0) and (mixed_nash[0] < 1) and (mixed_nash[1]>0) and (mixed_nash[1]<1):
+        NE.append(mixed_nash)
+    return np.array(NE)
+
+Nash_equilibria = find_NE(a, A, d, D, b, B, c, C)
+print(Nash_equilibria)
 
 def g(strategies, player, option):
     other_player = (player+1)%2
@@ -73,7 +97,7 @@ def plot_distance():
 
 
 def plot_line(fixed, value_of_fixed):
-    """returns where a line is mapped. fixed \in {0, 1}, value_of_fixed \in [0, 1]"""
+    """returns where a line is mapped. fixed is either 0 or 1, meaning vertical or horizontal lines, value_of_fixed \in [0, 1]"""
 
     not_fixed = (1+fixed)%2
     strategy = np.empty(2)
@@ -118,5 +142,7 @@ def plot_distortion():
     plt.savefig(name_game + ' distortion.png')
     plt.show()
 
-plot_distance()
-plot_distortion()
+if __name__ == '__main__':
+
+    plot_distance()
+    plot_distortion()
