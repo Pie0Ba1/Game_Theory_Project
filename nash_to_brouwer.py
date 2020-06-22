@@ -18,14 +18,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 #choose a game (uncomment)
-name_game = 'Cooperation game'
-a, A, d, D, b, B, c, C = 4, 4, 2, 2, 0, 0, 0, 0
+# name_game = 'Cooperation game'
+# a, A, d, D, b, B, c, C = 4, 4, 2, 2, 0, 0, 0, 0
 
-# name_game = "No pure Nash equilibrium"
-# a, A, d, D, b, B, c, C = 0, 0, 1, 1, 2, -1, 3, -1
+name_game = "No pure Nash equilibrium"
+a, A, d, D, b, B, c, C = 0, 0, 1, 1, 2, -1, 3, -1
 
 # name_game = "Prisoner's dilemma"
-#a, A, d, D, b, B, c, C = -1, -1, -2, -2, -3, -3, 0, 0
+# a, A, d, D, b, B, c, C = -1, -1, -2, -2, -3, -3, 0, 0
 
 
 #form suitable for further calculations
@@ -49,6 +49,7 @@ def find_NE(a, A, d, D, b, B, c, C):
     return np.array(NE)
 
 Nash_equilibria = find_NE(a, A, d, D, b, B, c, C)
+print('Nash equilibria:')
 print(Nash_equilibria)
 
 def g(strategies, player, option):
@@ -113,6 +114,17 @@ def plot_line(fixed, value_of_fixed):
     return X, Y
 
 
+def plot_line_compositions(xinput, yinput):
+    """returns where a line is mapped. fixed is either 0 or 1, meaning vertical or horizontal lines, value_of_fixed \in [0, 1]"""
+    strategy = np.empty(2)
+    X = np.empty(len(xinput))
+    Y = np.empty(len(yinput))
+
+    for i in range(len(xinput)):
+        strategy[0], strategy[1] = xinput[i], yinput[i]
+        X[i], Y[i] = f(strategy)
+    return X, Y
+
 def plot_distortion():
     """plots grid distortion"""
     num_lines = 20
@@ -142,7 +154,42 @@ def plot_distortion():
     plt.savefig(name_game + ' distortion.png')
     plt.show()
 
+
+def plot_composition():
+    """plots grid distortion"""
+    num_lines = 100
+    value = np.linspace(0, 1, num_lines)
+    ones = np.ones(num_lines)
+    X = np.empty((num_lines, num_lines))
+    Y = np.empty((num_lines, num_lines))
+
+    for i in range(num_lines):
+        #vertical lines
+        X[i, :] = ones*value[i]
+        Y[i, :] = value
+
+    plt.figure(figsize=(10, 10))
+
+    for num_composition in range(50):
+        plt.title(name_game)
+
+        for i in range(num_lines):
+            X[i], Y[i] = plot_line_compositions(X[i], Y[i])
+            plt.scatter(X[i], Y[i], color='orange')
+
+        plt.scatter(Nash_equilibria[:, 0], Nash_equilibria[:, 1], s=80, color='red')
+        plt.xlabel(r'$\alpha$')
+        plt.ylabel(r'$\beta$')
+        plt.xlim(0, 1)
+        plt.ylim(0, 1)
+        # plt.savefig(name_game + ' distortion.png')
+        plt.savefig('iteration_grid_no_pure_NE/' + str(num_composition) + '.png')
+        plt.close()
+
+
 if __name__ == '__main__':
 
-    plot_distance()
-    plot_distortion()
+    plot_composition()
+
+    # plot_distance()
+    # plot_distortion()
